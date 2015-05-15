@@ -5,11 +5,11 @@ import org.scalatest.FlatSpec
 class GenesisBlockSpec extends FlatSpec {
 
   val bytes = Files.readAllBytes(
-      Paths.get(getClass.getResource("com/strongfellow/util/genesis.bin").getPath()))
+      Paths.get(getClass.getResource("com/strongfellow/util/genesis.bin").getPath())).view
 
   "uint" should "function correctly" in {
     val bs = Array[Byte](97, -5, 100, 114, 101, 119)
-    assert(BlockParser.uint(bs, 0, bs.length) == 131277594622817L)
+    assert(BlockParser.uint(bs) == 131277594622817L)
   }
 
   "The genesis block" should "have 293 bytes" in {

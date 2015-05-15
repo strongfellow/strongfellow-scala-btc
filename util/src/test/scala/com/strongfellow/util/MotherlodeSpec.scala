@@ -5,14 +5,9 @@ import org.scalatest.FlatSpec
 class MotherlodeSpec extends FlatSpec {
 
   val bytes = Files.readAllBytes(
-      Paths.get(getClass.getResource("com/strongfellow/util/motherlode.bin").getPath()))
+      Paths.get(getClass.getResource("com/strongfellow/util/motherlode.bin").getPath())).view
 
-  "uint" should "function correctly" in {
-    val bs = Array[Byte](97, -5, 100, 114, 101, 119)
-    assert(BlockParser.uint(bs, 0, bs.length) == 131277594622817L)
-  }
-
-  "The motherlode block" should "have 293 bytes" in {
+  "The motherlode block" should "have 249034 bytes" in {
     assert(bytes.length == 249034)
   }
 
@@ -42,11 +37,11 @@ class MotherlodeSpec extends FlatSpec {
     assert(BlockParser.time(bytes) == 1385139919L)
   }
   it should "have bits fb0b0719" in {
-    assert(BlockParser.bits(bytes) == "ffff001d")
+    assert(BlockParser.bits(bytes) == "fb0b0719")
   }
 
-  it should "have nonce 2083236893" in {
-    assert(BlockParser.nonce(bytes) == 2083236893)
+  it should "have nonce 400522433" in {
+    assert(BlockParser.nonce(bytes) == 400522433)
   }
   
 
