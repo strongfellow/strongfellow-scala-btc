@@ -1,4 +1,6 @@
 
+package com.strongfellow.util
+
 import java.security.MessageDigest
 
 object BlockParser {
