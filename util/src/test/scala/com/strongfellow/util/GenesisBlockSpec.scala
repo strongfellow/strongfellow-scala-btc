@@ -1,4 +1,5 @@
 
+import com.strongfellow.util.BlockParser
 import java.nio.file.{Files, Paths}
 import org.scalatest.FlatSpec
 

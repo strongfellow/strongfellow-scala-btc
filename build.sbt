@@ -20,3 +20,9 @@ lazy val core = (project in file("core")).
   settings(
     name := "core"
   )
+
+lazy val awsutil = (project in file("awsutil")).
+  settings(commonSettings: _*).
+  settings(
+    name := "awsutil"
+  )

@@ -1,4 +1,5 @@
-  
+
+import com.strongfellow.util.BlockParser  
 import java.nio.file.{Files, Paths}
 import org.scalatest.FlatSpec
 
@@ -652,4 +653,16 @@ class MotherlodeSpec extends FlatSpec {
     assert(BlockParser.computedMerkleRoot(bytes) == "5fb8579760beed603fec03a122e8a0417645a46ecab20e2e52975675ff63c4c6")
   }
 
+  it should "have a huge transaction" in {
+    val txs = BlockParser.transactions(bytes)
+    val tx = txs(1)
+    val txIns = BlockParser.txIns(tx)
+    assert(txIns.length == 47)
+    val txOuts = BlockParser.txOuts(tx)
+    assert(txOuts.length == 2)
+    val bigTxOut = txOuts(0)
+    val littleTxOut = txOuts(1)
+    assert(BlockParser.txOutValue(bigTxOut) == 19499300000000L)
+    assert(BlockParser.txOutValue(littleTxOut) == 50000004L)
+  }
 }

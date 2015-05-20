@@ -4,6 +4,11 @@ package com.strongfellow.util
 import java.security.MessageDigest
 
 object BlockParser {
+  private def varString(bs:Seq[Byte]) = {
+    val (n,b) = varInt(bs)
+    hex(bs.drop(b).take(n.toInt))
+  }
+
   def magic(block:Seq[Byte]) : String = hex(block.take(4))
   def blockLength(block:Seq[Byte]) : Long = uint32(block.drop(4))
 
@@ -86,15 +91,52 @@ object BlockParser {
     index
   }
 
-  def transactions(block:Seq[Byte]) = {
-    val (n, b) = varInt(block.drop(88))
-    var start = 88 + b
-    val xs = 1.to(n.toInt).scanLeft(start)((s,_) => s + transactionLength(block.drop(s)))
-    (xs zip xs.tail).map { case(s, e) => block.drop(s).take(e - s) }
+  private def subSeqGenerator(bytes:Seq[Byte], f: Seq[Byte] => Int) = {
+    val (n,b) = varInt(bytes)
+    var start = b
+    val xs = 1.to(n.toInt).scanLeft(start)((s,_) => s + f(bytes.drop(s)))
+    (xs zip xs.tail).map { case(s, e) => bytes.drop(s).take(e - s) }
   }
 
-  def computedMerkleRoot(bytes:Seq[Byte]) : String = {
-    var shas = transactions(bytes).map(dHash(_)).toArray
+  def transactions(block:Seq[Byte]) = subSeqGenerator(block.drop(88), transactionLength)
+
+  def txVersion(tx:Seq[Byte]) : Long = uint8(tx)
+  def txIns(tx:Seq[Byte]) : Seq[Seq[Byte]] = subSeqGenerator(tx.drop(4), txInLength)
+  def txOuts(tx:Seq[Byte]) : Seq[Seq[Byte]] = {
+    var start = 4 
+    val (n, b) = varInt(tx.drop(4))
+    start += b
+    start += txIns(tx).map(_.length).sum
+    subSeqGenerator(tx.drop(start), txOutLength)
+  }
+
+  def txInLength(bytes:Seq[Byte]) : Int = {
+    var index = 32 // hash
+    index += 4 // index
+    val (nScript, nBytes) = varInt(bytes.drop(index))
+    index += nBytes
+    index += nScript.toInt
+    index += 4 // sequenceNo
+    index
+  }
+
+  def txInHash(txin:Seq[Byte]) = hashHex(txin)
+  def txInIndex(txin:Seq[Byte]) = uint32(txin.drop(32))
+  def txInScript(txin:Seq[Byte]) = varString(txin.drop(36))
+  def txInSequenceNo(txin:Seq[Byte]) = uint32(txin.takeRight(4))
+
+  def txOutLength(bytes:Seq[Byte]) = {
+    var index = 8 // value
+    val (nScript, nScriptBytes) = varInt(bytes.drop(index))
+    index += nScriptBytes
+    index += nScript.toInt
+    index
+  }
+  def txOutValue(txout:Seq[Byte]) : Long = uint64(txout)
+  def txOutScript(txout:Seq[Byte]) = varString(txout.drop(8))
+
+  def computedMerkleRoot(block:Seq[Byte]) : String = {
+    var shas = transactions(block).map(dHash(_)).toArray
     var len = shas.length
     while (len > 1) {
       for (i <- (0 until len by 2)) {

@@ -1,0 +1,9 @@
+
+(t) => 0, value, srcBlock
+(txid, idx) => 1, -1, destBlock, spend: (txid, idx, destBlock)
+
+
+
+
+
+(block) (txNumber, txinIndex, value)
