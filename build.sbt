@@ -1,4 +1,5 @@
 
+
 lazy val commonSettings = Seq(
   organization := "com.strongfellow",
   version := "0.0.1",
@@ -25,4 +26,11 @@ lazy val awsutil = (project in file("awsutil")).
   settings(commonSettings: _*).
   settings(
     name := "awsutil"
+  )
+
+lazy val btcspark = (project in file("btcspark")).
+  dependsOn("util").
+  settings(commonSettings: _*).
+  settings(
+    name := "btcspark"
   )
