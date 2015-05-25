@@ -7,7 +7,7 @@ import org.apache.hadoop.io._
 import com.strongfellow.util._
 import scala.math.Ordering.Implicits._
 
-object SimpleApp {
+object TxinsByBlock {
 
   def main(args: Array[String]) {
     val output = args.head
@@ -39,11 +39,6 @@ object SimpleApp {
         case (_, _, block, i, j) => (block, (i, j, value))
       })
     })
-
-//    val r2 = r1.groupByKey().map({ case (block, tuples) =>
-//      (block, tuples.toArray.sortWith(_ < _).map({case (i, j, value) => (i, j,value)}).mkString("|"))
-//    })
-//    r2.saveAsTextFile(output + "/r2")
 
     def bs(n:Long) : Seq[Byte] = (0 to 7).map(i => ((n >>> (8 * i)) & 0xff).byteValue())
     val r3 = r1.groupByKey().map({ case (block, tuples) =>
