@@ -24,10 +24,28 @@ class Cache {
     }
   }
 
+  def remoteAndLocalMatch(bs:Array[Byte], bucket:String, key:String):Boolean = {
+    val remote = remoteMd5(bucket, key)
+    remote match {
+      case Some(m) => m == md5(bs)
+      case None => false
+    }
+  }
+
   def put(bs:Array[Byte], bucket:String, key:String):Unit = {
     val stream:InputStream = new ByteArrayInputStream(bs)
     val meta:ObjectMetadata = new ObjectMetadata()
     meta.setContentLength(bs.length)
     s3.putObject(bucket, key, stream, meta);
   }
+
+  def cache(bs:Array[Byte], bucket:String, key:String):Boolean = {
+    if (!remoteAndLocalMatch(bs, bucket, key)) {
+      put(bs, bucket, key)
+      true
+    } else {
+      false
+    }
+  }
+
 }

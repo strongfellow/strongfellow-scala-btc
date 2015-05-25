@@ -16,7 +16,7 @@ lazy val util = (project in file("util")).
   )
 
 lazy val core = (project in file("core")).
-  dependsOn("util").
+  dependsOn(util).
   settings(commonSettings: _*).
   settings(
     name := "core"
@@ -29,7 +29,7 @@ lazy val awsutil = (project in file("awsutil")).
   )
 
 lazy val btcspark = (project in file("btcspark")).
-  dependsOn("util").
+  dependsOn(util, awsutil).
   settings(commonSettings: _*).
   settings(
     name := "btcspark"

@@ -1,4 +1,6 @@
 
+package com.strongfellow.btcspark
+
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.hadoop.io._
@@ -38,15 +40,15 @@ object SimpleApp {
       })
     })
 
-    def bs(n:Long) : Seq[Byte] = (0 to 3).map(i => (n >>> (8 * i) & 0xff).byteValue())
-    val r2 = r1.groupByKey().map({ case (block, tuples) =>
-      (block, tuples.toArray.sortWith(_ < _).map({case (i, j, value) => (i, j,value)}).mkString("|"))
-    })
+//    val r2 = r1.groupByKey().map({ case (block, tuples) =>
+//      (block, tuples.toArray.sortWith(_ < _).map({case (i, j, value) => (i, j,value)}).mkString("|"))
+//    })
+//    r2.saveAsTextFile(output + "/r2")
 
+    def bs(n:Long) : Seq[Byte] = (0 to 7).map(i => ((n >>> (8 * i)) & 0xff).byteValue())
     val r3 = r1.groupByKey().map({ case (block, tuples) =>
       (block, tuples.toArray.sortWith(_ < _).flatMap({case (i, j, value) => bs(value)}))
     })
-    r2.saveAsTextFile(output + "/r2")
-    r3.saveAsSequenceFile(output + "/r3")
+    r3.saveAsSequenceFile(output + "/txout-values-by-block")
   }
 }
